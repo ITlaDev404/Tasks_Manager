@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const TaskApp());
 }
+class TaskApp extends StatelessWidget {
+  const TaskApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: HomeScreen(),
+    );
+  }
+}
+
+
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

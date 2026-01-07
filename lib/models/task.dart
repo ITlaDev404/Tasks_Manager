@@ -6,12 +6,12 @@ class Task {
   Task({required this.title, required this.date, this.isDone = false});
 
   String getTitle() {
-    return this.title;
+    return title;
   }
   DateTime getDate(){
-    return this.date;
+    return date;
   }
   bool getIsDone(){
-    return this.isDone;
+    return isDone;
   }
 }
