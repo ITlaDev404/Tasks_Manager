@@ -1,48 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../models/task.dart';
+import '../viewmodels/task_viewmodel.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  DateTime _selectedDay = DateTime.now();
-  List<Task> tasks = [];
-
-  void _addTask(String title) {
-    setState(() {
-      tasks.add(Task(title: title, date: _selectedDay));
-    });
-  }
+class HomeView extends StatelessWidget {
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedTasks =
-        tasks.where((task) => isSameDay(task.date, _selectedDay)).toList();
+    final taskViewModel = Provider.of<TaskViewModel>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Gestionnaire de tâches")),
+      appBar: AppBar(title: const Text("Gestionnaire de tâches")),
       body: Column(
         children: [
           TableCalendar(
-            focusedDay: _selectedDay,
+            focusedDay: taskViewModel.selectedDay,
             firstDay: DateTime(2020),
             lastDay: DateTime(2030),
-            selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
+            selectedDayPredicate: (day) => isSameDay(day, taskViewModel.selectedDay),
             onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-              });
+              taskViewModel.setSelectedDay(selectedDay);
             },
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: selectedTasks.length,
+              itemCount: taskViewModel.tasks.length,
               itemBuilder: (context, index) {
-                final task = selectedTasks[index];
+                final task = taskViewModel.tasks[index];
                 return ListTile(
                   title: Text(
                     task.title,
@@ -54,9 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   trailing: Checkbox(
                     value: task.isDone,
                     onChanged: (value) {
-                      setState(() {
-                        task.isDone = value!;
-                      });
+                      taskViewModel.toggleTaskStatus(task);
                     },
                   ),
                 );
@@ -66,27 +49,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           showDialog(
             context: context,
             builder: (context) {
               TextEditingController controller = TextEditingController();
               return AlertDialog(
-                title: Text("Nouvelle tâche"),
+                title: const Text("Nouvelle tâche"),
                 content: TextField(
                   controller: controller,
-                  decoration: InputDecoration(hintText: "Nom de la tâche"),
+                  decoration: const InputDecoration(hintText: "Nom de la tâche"),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () {
-                      _addTask(controller.text);
+                      if (controller.text.isNotEmpty) {
+                        taskViewModel.addTask(controller.text);
+                      }
                       Navigator.pop(context);
                     },
-                    child: Text("Ajouter"),
+                    child: const Text("Ajouter"),
                   )
-                ],  
+                ],
               );
             },
           );
